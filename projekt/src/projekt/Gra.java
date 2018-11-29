@@ -1,8 +1,6 @@
 package projekt;
 
-import java.awt.Color;
 import java.awt.Dimension;
-
 import javax.swing.JPanel;
 
 public class Gra extends JPanel implements Runnable {
@@ -19,16 +17,15 @@ public class Gra extends JPanel implements Runnable {
 		setPreferredSize(new Dimension(WIDTH,HEIGHT));	
 		this.setBackground(null);
 		this.setLayout(null);	
-		Plansza plansza = new Plansza(this);
-		//Menu menu = new Menu(this);
-		
-		
+		Plansza plansza = new Plansza(this);//odkomentować do rysowania planszy
+			
 	}
 	
 
 	
 	@Override
 	public void run() {
+		
 		
 		int fps = 0, updates = 0;
 		long fpsTimer = System.currentTimeMillis();
@@ -55,8 +52,7 @@ public class Gra extends JPanel implements Runnable {
 			
 			
 			if(System.currentTimeMillis()- fpsTimer > 1000){
-				//System.out.printf("%d fps %d updates" , fps, updates);
-				
+				//System.out.printf("%d fps %d updates" , fps, updates);			
 				//System.out.println("Minê³a sekunda");
 				fps = 0;
 				updates = 0;
