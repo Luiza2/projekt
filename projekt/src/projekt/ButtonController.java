@@ -30,10 +30,10 @@ public class ButtonController implements ActionListener {
 		if(this.kliknieteGuziki.size()<2)
 			{
 			Plansza.returner();
-			//System.out.println(sumy[2]);
+			
 			dzwiek(new File("klik.wav"));
 			
-			//System.out.println("zaznacz z buttoncontroller");
+			
 			return dodajDoWektora(guzik);
 			}
 			
@@ -81,10 +81,7 @@ public class ButtonController implements ActionListener {
 				
 				
 				System.out.println(liczba + liczba2);
-				
-	//			if(drugiGuzik.getNum()== guzik.getNum()) 
-	//				this.kliknieteGuziki.clear();
-					//else 
+				 
 						this.turnDownTimer.start();
 			}
 				return true;

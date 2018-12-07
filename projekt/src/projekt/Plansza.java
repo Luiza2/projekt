@@ -93,13 +93,11 @@ public class Plansza implements MouseListener {
 		for(int i = 0 ; i < startoweKwadraty; i++)
 		{
 			wartosciKwadratow[i] = Integer.parseInt(wybrane[i]);
-			//System.out.println(wartosciKwadratow[i]); //wydrukowac wylosowane wartosci
-			//System.out.println(wybrane[i]);
 			sumaLiczb = sumaLiczb + wartosciKwadratow[i];
 	
 			if(i % 2 == 1) {
 				sumy[i] = sumaLiczb; //zapelnia elementy tablicy 1,3,5 itd.
-				//System.out.println(sumy[i]);
+				
 				Sumy suma = new Sumy(20 * i + 30 , sumaLiczb); // wpisuje sumy do uzyskania w panel boczny
 				polePunktow.add(suma);
 				sumaLiczb = 0;

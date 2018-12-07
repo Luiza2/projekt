@@ -44,14 +44,11 @@ public class Guzik extends JButton implements MouseListener{
 		return num;
 	}
 	
-	public int getNum() {
-		//System.out.println(num);
-		return num;
-	}
+	
 	
 	public String podajWartosc() {
 		String wartosc = this.getText();
-		//System.out.println(wartosc);
+		
 		return wartosc;
 		
 	}
@@ -60,18 +57,15 @@ public class Guzik extends JButton implements MouseListener{
 
 	public void zaznaczKlikniecie() {
 		String zawartosc = this.podajWartosc();
-		//System.out.println("to z zaznaczklikniecie "+zawartosc );
+	
 		if(zawartosc != " ") {
 		
-		if(this.klikniety)return;
-		this.klikniety=true;//
-		this.setBackground(Color.green);
-		//System.out.println("to z Card");
-		
+			if(this.klikniety)return;
+			this.klikniety=true;//
+			this.setBackground(Color.green);
 			this.klikniety = this.controller.zaznacz(this);//
 		}
-		
-		//if(this.faceUp)this.setIcon(this.faceIcon); 
+
 	}
 	
 	//jesli kliknieto dwa guziki to odznacza ich klikniecie
