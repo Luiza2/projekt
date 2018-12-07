@@ -1,5 +1,8 @@
 package projekt;
 
+
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -7,21 +10,32 @@ import javax.swing.JButton;
 
 public class Guzik extends JButton implements MouseListener{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String wartoscKwadratu= " ";
-	int iloscKlikniec = 0;
-	String wartosc;
+	//int iloscKlikniec = 0;
+	//String wartosc;
 	boolean klikniety = false;
+	Color kolorPlanszy = new Color(255,	250,	205);
 	int num;
 	String wszystkie[]= {" "," "," "," "," "," "," "," "," "," "," "};
 	private ButtonController controller;
 	
-	Guzik(ButtonController controller, int num){
+	Guzik(ButtonController controller, int num, String wartoscKwadratu){
+		this.wartoscKwadratu = wartoscKwadratu;
+		
 		this.num = num;
 		this.setBounds(60,60,10,10);
 		this.setBackground(null);
 		this.setVisible(true);
 		this.addMouseListener(this);
+		Font czcionka = new Font("Italic", 0, 24);
+		this.setFont(czcionka);
 		this.controller = controller;
+		
+		this.setText(wartoscKwadratu);
 		
 	}
 	
@@ -35,7 +49,7 @@ public class Guzik extends JButton implements MouseListener{
 		return num;
 	}
 	
-	public String getValue() {
+	public String podajWartosc() {
 		String wartosc = this.getText();
 		//System.out.println(wartosc);
 		return wartosc;
@@ -45,17 +59,26 @@ public class Guzik extends JButton implements MouseListener{
 	
 
 	public void zaznaczKlikniecie() {
+		String zawartosc = this.podajWartosc();
+		//System.out.println("to z zaznaczklikniecie "+zawartosc );
+		if(zawartosc != " ") {
+		
 		if(this.klikniety)return;
 		this.klikniety=true;//
+		this.setBackground(Color.green);
 		//System.out.println("to z Card");
-		this.klikniety = this.controller.turnUp(this);//
+		
+			this.klikniety = this.controller.zaznacz(this);//
+		}
+		
 		//if(this.faceUp)this.setIcon(this.faceIcon); 
 	}
 	
 	//jesli kliknieto dwa guziki to odznacza ich klikniecie
 	public void odznaczKlikniecie() {
 		this.klikniety = false;
-		//System.out.println("wywolano turnda³n z guzika");
+		this.setBackground(kolorPlanszy);
+		
 	}
 	
 	@Override

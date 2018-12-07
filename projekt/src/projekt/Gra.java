@@ -7,17 +7,18 @@ public class Gra extends JPanel implements Runnable {
 
 	
 	private static final long serialVersionUID = 1L;
-	public static final int WIDTH = 900;
-	public static final int HEIGHT = 700;
-	private Thread game;
+	public static final int SZEROKOSC = 750;
+	public static final int WYSOKOSC = 700;
+	private Thread gra;
 	private boolean running;
+	public int calkowityCzas = 600;
 	
 	public Gra(){
 		setFocusable(true);
-		setPreferredSize(new Dimension(WIDTH,HEIGHT));	
+		setPreferredSize(new Dimension(SZEROKOSC,WYSOKOSC));	
 		this.setBackground(null);
 		this.setLayout(null);	
-		Plansza plansza = new Plansza(this);//odkomentować do rysowania planszy
+		Plansza plansza = new Plansza(this);
 			
 	}
 	
@@ -52,8 +53,9 @@ public class Gra extends JPanel implements Runnable {
 			
 			
 			if(System.currentTimeMillis()- fpsTimer > 1000){
-				//System.out.printf("%d fps %d updates" , fps, updates);			
-				//System.out.println("Minê³a sekunda");
+				//System.out.printf("%d fps %d updates" , fps, updates);	
+				calkowityCzas -= 1;
+				//System.out.println(calkowityCzas);
 				fps = 0;
 				updates = 0;
 				fpsTimer += 1000;
@@ -77,8 +79,8 @@ public class Gra extends JPanel implements Runnable {
 	public synchronized void start(){
 		if(running)return;
 		running = true;
-		game = new Thread(this, "game");
-		game.start();
+		gra = new Thread(this, "game");
+		gra.start();
 	}
 	
 	public synchronized void stop(){
