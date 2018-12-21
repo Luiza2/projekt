@@ -17,13 +17,16 @@ import javax.swing.JPanel;
 public class Plansza implements MouseListener {
 
 	public static int RZEDY = 7, KOLUMNY = 7;
+	public int poziom = 8;
 	Guzik[][] tablica = new Guzik[7][7];
-	int startoweKwadraty = 4;
+	static int startoweKwadraty = 0;
+	static Sumy [] sumyNaPlanszy = new Sumy[10];
+	static Sumy [] zaznaczone = new Sumy[10];
 	//int licznik = 0;
-	public static int sumy[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	String wybrane[] = {" "," "," "," "," "," "," "," "," "," "," "," "," "," "," " };
-	int wartosciKwadratow [] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	
+	private static int sumy[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	String wybrane[] = {" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," " };
+	int wartosciKwadratow [] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static int wykorzystanei[] = {0,0,0,0,0,0,0,0,0,0,0};
 	
 	Plansza(JPanel panelPlanszy) {
 		
@@ -75,57 +78,72 @@ public class Plansza implements MouseListener {
 		cele.setText("Cele");
 		cele.setFont(czcionkaCele);
 		
-		
-		
-		polePunktow.add(cele);
-		
-		
-		
-		
-		start(plansza,  polePunktow);
+		polePunktow.add(cele);	
+
+		start(plansza,  polePunktow, poziom);
 	}
 	
+	public static int ileStartowych() {
+		return startoweKwadraty;
+	}
 	
 	//sumuje parami wartosci kwadratow i wyswietla je w panelu bocznym
 	public void sumator( JPanel polePunktow ) {
 
+		
 		int sumaLiczb = 0;
 		for(int i = 0 ; i < startoweKwadraty; i++)
 		{
 			wartosciKwadratow[i] = Integer.parseInt(wybrane[i]);
 			sumaLiczb = sumaLiczb + wartosciKwadratow[i];
-	
 			if(i % 2 == 1) {
 				sumy[i] = sumaLiczb; //zapelnia elementy tablicy 1,3,5 itd.
-				
-				Sumy suma = new Sumy(20 * i + 30 , sumaLiczb); // wpisuje sumy do uzyskania w panel boczny
-				polePunktow.add(suma);
+				//Sumy suma = new Sumy(20 * i + 30 , sumaLiczb); // wpisuje sumy do uzyskania w panel boczny
+				//polePunktow.add(suma);
+				sumyNaPlanszy[i] = new Sumy(20 * i + 30 , sumaLiczb); // to samo co wyzej na tablicy
+				polePunktow.add(sumyNaPlanszy[i]);
+				System.out.println(sumaLiczb);
 				sumaLiczb = 0;
 			}
 		}
 	}
 	
-	public static int[] returner() {
+	public static int[] getSumy()
+    {   
+        return sumy;
+    }
+
+	//pobiera JLabele do zmieniania koloru po poprawnym dodaniu liczb
+	public static Sumy[] getPanele(int numer) {
+		sumyNaPlanszy[numer].zmienKolor();
+		//System.out.println("W³am do getPanele");
+		//uzyte(numer);
 		
-		System.out.println("wywolano returner z planszy");
-		System.out.println(sumy[1]);
-		System.out.println(sumy[3]);
-		
-		return sumy;
-		
+		return sumyNaPlanszy;
 	}
 	
+	
+	
+	
 	//wywoluje rysowanie planszy oraz sumowanie parami wylosowanych wartosci kwadratow
-	public void start(JPanel plansza, JPanel polePunktow){
+	public void start(JPanel plansza, JPanel polePunktow, int poziom){
 		rysujPlansze(plansza);
 		
 		int licznik = 0;
+		if(poziom < 5) {
+			startoweKwadraty = 4;
+		}
+		else if(poziom >= 5 && poziom < 10) {
+			startoweKwadraty = 8;
+		}
+		else if(poziom >= 10) {
+			startoweKwadraty = 12;
+		}
 		
 		for(int i = 0 ; i < startoweKwadraty; i++){
 			losujWartosci(plansza, licznik);
 			licznik++;
 		}
-
 			sumator( polePunktow);
 	}
 	
@@ -133,11 +151,11 @@ public class Plansza implements MouseListener {
 	public void losujWartosci(JPanel plansza, int licznik) {
 		
 		Random random = new Random();
-		int mozliweWartosci[] = {-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9};
+		int mozliweWartosci[] = {-1,1,2,3};
 		int lokacja = random.nextInt(RZEDY * KOLUMNY);//mozliwe wyskoczenie cyferek
 		int rzad = lokacja / RZEDY;
 		int kolumna = lokacja % KOLUMNY;
-		int losowa = random.nextInt(18);		
+		int losowa = random.nextInt(4);		
 		String wartosc = Integer.toString(mozliweWartosci[losowa]);
 		tablica[rzad][kolumna].setText(wartosc);		
 		wybrane[licznik] = wartosc;

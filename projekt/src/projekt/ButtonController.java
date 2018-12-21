@@ -1,5 +1,6 @@
 package projekt;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -17,6 +18,9 @@ public class ButtonController implements ActionListener {
 	private final int turnDownDelay = 500;
 	public int sumki[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	//public int sumy[];
+	int [] wykorzystanei = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	
+	int licznik = 0;
 	
 	public ButtonController() {
 		
@@ -28,13 +32,9 @@ public class ButtonController implements ActionListener {
 	
 	public boolean zaznacz(Guzik guzik) {
 		if(this.kliknieteGuziki.size()<2)
-			{
-			Plansza.returner();
-			
-			dzwiek(new File("klik.wav"));
-			
-			
-			return dodajDoWektora(guzik);
+			{			
+				dzwiek(new File("klik.wav"));
+				return dodajDoWektora(guzik);
 			}
 			
 		return false;
@@ -58,37 +58,68 @@ public class ButtonController implements ActionListener {
 	public boolean dodajDoWektora(Guzik guzik) {
 		// TODO Auto-generated method stub
 		
-		
+		//Plansza.returner();
 		String zawartosc = guzik.podajWartosc();
 		
 		if(zawartosc != " ") {
 			this.kliknieteGuziki.add(guzik);
 			int liczba = Integer.parseInt(zawartosc);
-			//System.out.println(sumy[0]);
+			
 			System.out.println(zawartosc);
 			System.out.println("jeden guzik");
 			if(this.kliknieteGuziki.size()==2) {
+				
 				dzwiek(new File("pyk.wav"));
-				System.out.println("kliknieto dwa guziki");
-				Guzik drugiGuzik = (Guzik)this.kliknieteGuziki.get(0);
-				
+				//System.out.println("kliknieto dwa guziki");
+				Guzik drugiGuzik = (Guzik)this.kliknieteGuziki.get(0);				
 				String zawartosc2 = drugiGuzik.podajWartosc();
-				int liczba2 = Integer.parseInt(zawartosc2);
-				
-//				if(liczba + liczba2 == sumy[0]) {
-//					System.out.println("maj¹ t¹ sam¹ wartosc");
-//				}
-				
-				
+				int liczba2 = Integer.parseInt(zawartosc2);			
+				przyrownanie(liczba, liczba2);			
 				System.out.println(liczba + liczba2);
 				 
-						this.turnDownTimer.start();
+				this.turnDownTimer.start();
 			}
 				return true;
 		}
 		return false;
 	}
 
+	public boolean przyrownanie(int liczba, int liczba2) {
+		final int sumy[] = Plansza.getSumy().clone();
+		
+	    //final   Sumy[] su = Plansza.getPanele().clone();
+		 final int startoweKwadraty = Plansza.ileStartowych();
+		
+		for(int i = 1; i < 8; i += 2) {
+			
+			
+			
+			System.out.println(wykorzystanei[i]);
+			if(liczba + liczba2 == sumy[i]) {
+				
+					if(wykorzystanei[i] != 0) {
+						
+						continue;
+					}
+					else {
+							licznik++;
+							wykorzystanei[i] = i;
+							System.out.println("poprawnie dodano sume numer " +i);
+							Plansza.getPanele(i);
+							if(licznik == startoweKwadraty / 2 ) {
+								System.out.println("nowy level");
+								//Plansza.start();
+								licznik = 0;
+							}
+							return true;
+					}
+						
+				}
+			
+			}
+			
+		return false;
+	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
