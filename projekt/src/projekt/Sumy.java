@@ -1,43 +1,43 @@
 package projekt;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Image;
+import java.awt.Point;
+import java.io.File;
 
-import javax.swing.JLabel;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
-public class Sumy extends JLabel implements ActionListener {
+public class Sumy {
+
+	/** Wspó³rzêdna x sumy */
+    public int x;
+    /** Wspó³rzêdna y sumy */
+    public int y;
+    /** Wartosc sumy*/
+    public int wartosc;
+    /** Ikona sumy do uzyskania i sumy po poprawnym obliczeniu*/
+    public Image icon;
+    
+    
+    public Sumy(int x, int y, Image[] images, int wartosc) {
+        this.x=x;
+        this.y=y;
+        this.wartosc = wartosc;
+        /*jeœli suma mia³a wartoœæ niedodatni¹ to ten fragment przyporz¹dkowuje 
+         * odpowiednie obrazki. Ich indeksy zaczynaj¹ siê od 18 w tablicy
+         * Images. 37 - 18 = 19, a zdjêcie wybierane dla sumy ma indeks 
+         * wartosc - 1, czyli mo¿liwe indeksy do wybrania znajduj¹ siê 
+         * w przedziale <18, 36>
+         */
+        if(wartosc < 1) { //37 - 18 = 19
+        	wartosc = wartosc + 37;
+        }
+        // wartosc cyfry na ograzku to nr foty
+        icon=images[wartosc-1];
+ 
+    	
+    }
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	Color kolorPoprawny = new Color(135,	206	,235);
-	String sumaLiczbString = " ";
-	Sumy(int i, int sumaLiczb){
-		
-		this.setBounds(90 ,i ,70 ,70);
-		Font czcionka = new Font("Italic", 0, 24);
-		sumaLiczbString = Integer.toString(sumaLiczb);
-		this.setFont(czcionka);
-		this.setText(sumaLiczbString);
-		
-	}
-	
-	public void zmienKolor() {
-		
-		Font czcionka1 = new Font("Italic", 0, 30);
-		this.setForeground(kolorPoprawny);
-		//this.setFont(czcionka1);
-		//System.out.println("zmieniarka koloru z klasy sumy");
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		//zmienKolor();
-	}
-	
+     
 }
