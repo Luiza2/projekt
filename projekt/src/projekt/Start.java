@@ -5,8 +5,6 @@ package projekt;
  * na przedmiot Jêzyki Programowania Wysokiego Poziomu
  * @author Luiza B³aszczak
  */
-
-
 public class Start {
 
 	/**

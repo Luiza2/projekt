@@ -1,13 +1,16 @@
 package projekt;
 
 import java.awt.Image;
-import java.awt.Point;
 import java.io.File;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
+/**
+ * Klasa odpowiadaj¹ca za cyferki
+ * @author Luiza B³aszczak
+ */
 public class Cyferki {
 
 	/** Wspó³rzêdna x obiektu */
@@ -41,7 +44,6 @@ public class Cyferki {
         szerokoscCyferki=icon.getWidth(null);
         wysokoscCyferki=icon.getHeight(null);
  
-    	
     }
 	
     /**

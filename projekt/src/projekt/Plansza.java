@@ -13,7 +13,16 @@ import java.util.Vector;
 import javax.swing.JPanel;
 
 
+/**
+ * Odpowiada za operacje wykonywane na planszy, przechodzenie pomiêdzy poziomami menu,
+ * wyœwietlanie wyniku, obs³ugê myszki
+ * @author Luiza B³aszczak
+ */
 public class Plansza extends JPanel{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/** Czas gry */
 	public static int czas = 200;
 	/** Tablica przechowujaca wylosowane cyfry*/
