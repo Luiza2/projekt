@@ -39,12 +39,6 @@ public class Guzik extends JButton implements MouseListener{
 		
 	}
 	
-	public int podajLokacje() {
-		System.out.println(num);
-		return num;
-	}
-	
-	
 	
 	public String podajWartosc() {
 		String wartosc = this.getText();

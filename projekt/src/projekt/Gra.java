@@ -22,36 +22,28 @@ public class Gra extends JPanel implements Runnable {
 			
 	}
 	
-
-	
 	@Override
 	public void run() {
-		
 		
 		int fps = 0, updates = 0;
 		long fpsTimer = System.currentTimeMillis();
 		double nsPerUpdate = 1000000000.0 / 60.0;
-		
-		
 		double then = System.nanoTime();
 		double unprocessed = 0;
-		
-		
+				
 		while(running){
 			
 			boolean shouldRender = false;
 			double now = System.nanoTime();
 			unprocessed +=(now - then)/nsPerUpdate;
 			then = now;
-			
-			
+					
 			while(unprocessed >= 1){
 				updates++;
 				unprocessed--;
 				shouldRender = true;
 			}
-			
-			
+						
 			if(System.currentTimeMillis()- fpsTimer > 1000){
 				//System.out.printf("%d fps %d updates" , fps, updates);	
 				calkowityCzas -= 1;
