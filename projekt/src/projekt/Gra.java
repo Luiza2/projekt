@@ -6,17 +6,16 @@ import javax.swing.JFrame;
  * Okno g³ówne gry
  * @author Luiza B³aszczak
  */
-
 public class Gra extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	
 	/**
      * G³ówny konstruktor klasy - ustawienie parametrów i rozpoczêcie akcji
      * @param szerokosc szerokoœæ okna gry
      * @param wysokosc wysokoœæ okna gry
      * @param calkowityCzas czas gry
      */
-	
 	public Gra(int szerokosc, int wysokosc){
 		
 		super("£¹czenie cyferek"); //wywo³anie konstruktora klasy nadrzêdnej - utworzenie okna

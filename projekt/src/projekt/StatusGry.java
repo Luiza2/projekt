@@ -1,5 +1,9 @@
 package projekt;
 
+/**
+ * Odpowiada za status gry
+ * @author Luiza B³aszczak
+ */
 public class StatusGry {
 
 	
@@ -19,7 +23,7 @@ public class StatusGry {
      */
     public void nastepnyPoziom(){
     	poziom++;
-    }//nextLevel()
+    }//nastepnyPoziom()
 	
 }
 

@@ -1,13 +1,12 @@
 package projekt;
 
 import java.awt.Image;
-import java.awt.Point;
-import java.io.File;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 
+/**
+ * Klasa odpowiadaj¹ca za sumy rysowane w panelu bocznym
+ * @author Luiza B³aszczak
+ */
 public class Sumy {
 
 	/** Wspó³rzêdna x sumy */
