@@ -1,86 +1,57 @@
 package projekt;
 
-import java.awt.Dimension;
-import javax.swing.JPanel;
+import javax.swing.JFrame;
 
-public class Gra extends JPanel implements Runnable {
+/**
+ * Okno g³ówne gry
+ * @author Luiza B³aszczak
+ */
 
-	
+public class Gra extends JFrame {
+
 	private static final long serialVersionUID = 1L;
-	public static final int SZEROKOSC = 750;
-	public static final int WYSOKOSC = 700;
-	private Thread gra;
-	private boolean running;
-	public int calkowityCzas = 600;
+	/**
+     * G³ówny konstruktor klasy - ustawienie parametrów i rozpoczêcie akcji
+     * @param szerokosc szerokoœæ okna gry
+     * @param wysokosc wysokoœæ okna gry
+     * @param calkowityCzas czas gry
+     */
 	
-	public Gra(){
-		setFocusable(true);
-		setPreferredSize(new Dimension(SZEROKOSC,WYSOKOSC));	
-		this.setBackground(null);
-		this.setLayout(null);	
-		Plansza plansza = new Plansza(this);
+	public Gra(int szerokosc, int wysokosc){
+		
+		super("£¹czenie cyferek"); //wywo³anie konstruktora klasy nadrzêdnej - utworzenie okna
+		setSize(szerokosc, wysokosc); //ustawienie wymiarów okna	
+		setResizable(false); //nie mo¿na zmieniaæ wymiarów okna
+		setLocationRelativeTo(null); //okno pojawi siê w centrum ekranu
+		inicjalizacja(szerokosc, wysokosc); //wywo³anie metody tworzenia interfejsu
+		setVisible(true); //okno widoczne
+		petlaGry(); //wywo³anie metody - pêtla animacji gry
 			
 	}
 	
-	@Override
-	public void run() {
-		
-		int fps = 0, updates = 0;
-		long fpsTimer = System.currentTimeMillis();
-		double nsPerUpdate = 1000000000.0 / 60.0;
-		double then = System.nanoTime();
-		double unprocessed = 0;
-				
-		while(running){
-			
-			boolean shouldRender = false;
-			double now = System.nanoTime();
-			unprocessed +=(now - then)/nsPerUpdate;
-			then = now;
-					
-			while(unprocessed >= 1){
-				updates++;
-				unprocessed--;
-				shouldRender = true;
-			}
-						
-			if(System.currentTimeMillis()- fpsTimer > 1000){
-				//System.out.printf("%d fps %d updates" , fps, updates);	
-				calkowityCzas -= 1;
-				//System.out.println(calkowityCzas);
-				fps = 0;
-				updates = 0;
-				fpsTimer += 1000;
-			}
-			
-			
-			if(shouldRender){
-				fps++;
-				shouldRender = false;
-			} else{
-				try{
-					Thread.sleep(1);
-				}catch(Exception e){
-					e.printStackTrace();
-				}
+	/**
+	 * Metoda s³u¿¹ca do tworzenia interfejsu graficznego
+	 * @param szerokosc szerokoœæ okna
+	 * @param wysokosc wysokoœæ okna
+	 */
+	public void inicjalizacja(int szerokosc, int wysokosc) {
+		 Kontener.zaladujZdjecie();
+		 Plansza plansza = new Plansza(szerokosc,wysokosc); //utworzenie obiektu typu plansza
+		 add(plansza); //dodanie planszy do okna
+	}//inicjalizacja()
+	
+	/**
+	 * Pêtla g³ówna gry
+	 * @param timer s³u¿y do odœwie¿ania ekranu co sekundê i liczenia czasu trwania gry
+	 */
+	public void petlaGry() {
+		long timer = System.currentTimeMillis(); //pobranie aktualnego czasu w milisekundach			
+		while(true){ //nieskoñczona pêtla programu
+			if(System.currentTimeMillis()- timer > 1000){ //jeœli minê³a sekunda
+				repaint(); //odœwie¿ ekran
+				timer += 1000;
 			}
 		}
-		
-	}
-	
-	public synchronized void start(){
-		if(running)return;
-		running = true;
-		gra = new Thread(this, "game");
-		gra.start();
-	}
-	
-	public synchronized void stop(){
-		if(!running) return;
-		running = false;
-		
-		
-		System.exit(0);
-	}	
+	}//petlaGry()
 	
 }
