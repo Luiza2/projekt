@@ -3,10 +3,8 @@ package projekt;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.Random;
 import java.util.Vector;
 
@@ -14,37 +12,32 @@ import javax.swing.JPanel;
 
 
 /**
- * Odpowiada za operacje wykonywane na planszy, przechodzenie pomiêdzy poziomami menu,
- * wyœwietlanie wyniku, obs³ugê myszki
+ * Odpowiada za operacje wykonywane na planszy, przechodzenie pomiêdzy poziomami menu, wyœwietlanie wyniku, obs³ugê myszki
  * @author Luiza B³aszczak
  */
 public class Plansza extends JPanel{
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	/** Czas gry */
 	public static int czas = 200;
 	/** Tablica przechowujaca wylosowane cyfry*/
 	public int [] wylosowane = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	/** Tablica do ktorej trafiaja wylosowane sumy*/
-	public int [] sumy = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	/** Obiekt status gry*/
-	public StatusGry statusGry;
+	/** Obiekt poziomu gry*/
+	public Poziom Poziom;
 	/** Szerokoœæ pola graficznego gry*/
 	public int sSzerokosc;
 	/** Wysokoœæ pola graficznego gry*/
 	public int sWysokosc;
-	/** Iloœæ rzêdów i kolumn planszy*/
-	public static int RZEDY = 7, KOLUMNY = 7;
+	/** Iloœæ rzêdów */
+	public static int RZEDY = 7;
+	/** Iloœæ kolumn planszy */
+	public static int KOLUMNY = 7;
     /** Czcionka stosowana w pasku menu gry */
-    public Font graFont;
-	/** Tablica aby nie powtórzy³y sie lokalizacje cyferek na planszy */
-	public int lokalizacje[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	/** Tablica obiektów pierwszego planu - cyferek*/
+    public Font graFont = new Font("Dialog", Font.BOLD , 26);
+	/** Tablica obiektów cyferek*/
 	private Cyferki [] cyferki;
-	/** Tablica sum do narysowania */
-	private Sumy [] sumki;
+	/** Tablica wyników do narysowania */
+	private Wyniki [] wyniki;
 	/** Przechowuje miejsca na których wyskoczy³y cyferki, aby nie mog³y siê powtórzyæ i wzajemnie zakrywac */
 	int lokacje[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	/** S³u¿y do sumowania dwóch ostatnich klikniêc*/
@@ -55,167 +48,166 @@ public class Plansza extends JPanel{
 	int druga = 0;
 	/** Wektor do wpisywania klikniêtych cyfr*/
 	private Vector<Cyferki> dodaneCyfry = new Vector<Cyferki>(2);
-	/** Licznik do zliczania dodawanych sum*/
+	/** Licznik do zliczania obliczonych wyników na konkretnym poziomie */
 	int licznik = 0;
-	/** Przechowuje numer ostatniej dobrze policzonej sumy w celu odznaczenia jej w panelu bocznym */
-	int sumaPoliczona = 0;
-	int [] wykorzystanei = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	/** Przechowuje numer ostatniego dobrze policzonego wyniku w celu odznaczenia go w panelu bocznym */
+	int wynikObliczenie = 0;
+	/** Wyniki wykorzystane w danej rundzie */
+	int wynikiWykorzystane [] = {0,0,0,0,0,0,0,0,0,0,0,0};
 	
 	Plansza(int szerokosc, int wysokosc) {
 	
-		statusGry = new StatusGry();
-		statusGry.reset();
-		
-        graFont =new Font("Dialog",Font.BOLD,26);
-        
+		wyniki = new Wyniki[30];
+		Poziom = new Poziom();
+		Poziom.reset();	      
         this.sSzerokosc = szerokosc;
-		this.sWysokosc = wysokosc;
-		
-		
-		sumki = new Sumy[30];
-		startGame();
+		this.sWysokosc = wysokosc;		
+		startGry();
 	
 		addMouseListener(new MouseAdapter(){
             @Override
           public void mouseClicked(MouseEvent me){
             
-         //rozpoczêto grê
-         if(Kontener.menu == false && Kontener.instrukcja == false) {
-             
-              //Gdy klikniêto na pauzê w menu górnym
-              if(me.getX()>(460) && me.getX()<(660)  && me.getY()>(50) && me.getY()<(110)){
-                  Kontener.pauza=!Kontener.pauza;
-                  repaint();
-                  return;
-              }
-              
-            //Gdy klikniêto na guzik menu w menu górnym
-              if(me.getX()>(40) && me.getX()<(240)  && me.getY()>(50) && me.getY()<(110)){
-                  Kontener.menu =!Kontener.menu;
-                  Kontener.czasGry = czas;
-              }
-              
-            //Gdy klikniêto na przycisk restart
-              if(me.getX()>(40) && me.getX()<(240)  && me.getY()>(120) && me.getY()<(200)){
-                  if(Kontener.pauza){
-                	  Kontener.czasGry = czas;
-                      Kontener.startowe = 4;
-                      statusGry.reset();
-                      Kontener.tlo = Kontener.zaladujZdjecie("zdjecia/plansza.png");
-                      startGame();
-                      repaint();
-                  }
-              }
-              
-              if(Kontener.pauza == false) {
-              //sprawdz czy cyfra kliknieta
-	              for(int i = 0; i < cyferki.length ; i++){
-	                      if(cyferki[i].czyZawieraKlikniecie(me.getX(), me.getY())){
-	                          
-	                        	  //dodanie do wektora pierwszej kliknietej cyfry
-	                        	  if(dodaneCyfry.size()<1) {
-	                        		  int zawartosc = cyferki[i].podajWartosc();
-	                        		  dodaneCyfry.add(cyferki[i]);
-	                        		  sumaKlikniec = zawartosc;
-	                        	  }
-	                        	  //jesli pierwszy cyfra jest wpisana to dodaj 2 cyfrê do wektora
-	                        	  else {
-	                    			  int zawartosc2 = cyferki[i].podajWartosc();
-	                    			  sumaKlikniec = sumaKlikniec + zawartosc2;
-	                    			  
-	                    			  for(int j = 1 ; j < Kontener.startowe; j+=2) {
-	                  					  
-	                    				  //gdy suma dwóch ostatnich klikniêæ jest równa jednej z sum do uzyskania to przerysuj j¹                   				  
-	                    				  if(sumaKlikniec == sumki[j].wartosc) {
-	                    					  
-	                    					  if(wykorzystanei[j] != 0) {//gdy dana suma by³a ju¿ obliczona
-	                    						  continue;
-	                    					  }
-	                    					  else {//jeœli danej sumy nie obliczono wczeœniej
-	                    						  licznik++;
-	                    						  wykorzystanei[j] = j;
-	                    						  cyferki[j].dzwiek(new File("dzwieki/pyk.wav")); //dzwiek znikaj¹cej sumy
-	                    						  
-	                    						  Kontener.czasGry++;// dodane w celu zniwelowania czasu obs³ugi dodawania która zajmuje oko³o sekundy
-	                    						  
-	                    						  //wspó³rzêdna x dobrze obliczonej sumy 
-	                    						  int x = 105;
-	                    						  //wspó³rzêdna y dobrze obliczonej sumy 
-	                    						  int y = 320;
-	                    						  sumaPoliczona = j;
-	                    						  //narysowanie obliczonej sumy
-	                    						  sumki[j] = new Sumy(x , y + 30 * j,Kontener.obliczoneSumy, sumaKlikniec);
-	                    						  Kontener.czyZmienic = true;
-	                    						  //repaint();
-	                    						  //gdy obliczono wszystkie sumy z danej rundy to w zale¿noœci od poziomu narysuj odpowiedni¹ iloœæ sum do obliczenia
-	                    						  if(licznik == Kontener.startowe / 2) {
-	                    							  if(statusGry.poziom < 4) {
-	                    								  Kontener.startowe = 4;
-	                    							  }
-	                    							  else if(statusGry.poziom >= 4 && statusGry.poziom < 8) {
-	                    								  Kontener.startowe = 6;
-	                    							  }
-	                    							  else if(statusGry.poziom >= 8 && statusGry.poziom < 12) {
-	                    								  Kontener.startowe = 8;
-	                    							  }
-	                    							  else if(statusGry.poziom >= 12 && statusGry.poziom < 16) {
-	                    								  Kontener.startowe = 10;
-	                    							  }
-	                    							  else {
-	                    								  Kontener.startowe = 12;
-	                    							  }
-	                    							  
-	                    							  statusGry.nastepnyPoziom();
-	                    							  startGame();
-	                    							  zerujWykorzystane();
-	                    							  repaint();
-	                    							  licznik = 0;
-	                    						        
-	                    						  }
-	                    					  }
-	                    				  }
-	                    			  }
-	                    			  //wyczyœæ wektor
-	                    			  dodaneCyfry.clear();
-	                    			  sumaKlikniec = 0;
-	                    			  repaint();
-	                    		  }
-	                      }
+	         //rozpoczêto grê
+	         if(Kontener.menu == false && Kontener.instrukcja == false) {
+	             
+	              //Gdy klikniêto na pauzê w menu górnym
+	              if(me.getX()>(460) && me.getX()<(660)  && me.getY()>(50) && me.getY()<(110)){
+	                  Kontener.pauza=!Kontener.pauza;
+	                  repaint();
 	              }
-              }
-              }else if(Kontener.menu == true && Kontener.instrukcja == false){//gdy gra siê nie zaczê³a to wyœwietl menu g³ówne
-            	  
-            	  //klikniety przycisk startu gry
-            	  if(me.getX()>(268) && me.getX()<(492)  && me.getY()>(217) && me.getY()<(297)){
-            		  //ustaw parametry startowe
-                      Kontener.menu =!Kontener.menu;
-                      statusGry.reset();
-                      Kontener.czasGry = czas;
-                      Kontener.startowe = 4;
-                      startGame();
-                  }
-            	  
-            	  // klikniete informacje o grze
-            	  if(me.getX()>(268) && me.getX()<(492)  && me.getY()>(337) && me.getY()<(417)){
-            		  //wyœwietlenie obrazka instrukcji
-                      Kontener.instrukcja = true;
-                  }
-            	  
-            	  //gdy w menu g³ównym klikniêto przycisk wyjœcie
-            	  if(me.getX()>(268) && me.getX()<(492)  && me.getY()>(457) && me.getY()<(537)){
-            		  //opuszczenie gry
-                      System.exit(1);
-                  }
-            	  
-              }else if(Kontener.menu == true && Kontener.instrukcja == true) {//gdy jest wyœwietlana instrukcja
-            	  //i nast¹pi klikniêcie guzika menu to wróæ do menu g³ównego
-            	  if(me.getX()>(500) && me.getX()<(690)  && me.getY()>(620) && me.getY()<(676)){
-                	  Kontener.instrukcja = false;
-                	  Kontener.menu = true;
-                  }
-            	  
-              }
-          }//mouseClicked()
+	              
+	            //Gdy klikniêto na guzik menu w menu górnym
+	              if(me.getX()>(40) && me.getX()<(240)  && me.getY()>(50) && me.getY()<(110)){
+	                  Kontener.menu =!Kontener.menu;
+	                  Kontener.czasGry = czas;
+	                  zerujWykorzystane();
+	                  licznik = 0;
+	              }
+	              
+	            //Gdy klikniêto na przycisk restart
+	              if(me.getX()>(40) && me.getX()<(240)  && me.getY()>(120) && me.getY()<(200)){
+	                  if(Kontener.pauza){
+	                	  Kontener.czasGry = czas;
+	                      Kontener.startowe = 4;
+	                      licznik = 0;
+	                      zerujWykorzystane();
+	                      Poziom.reset();
+	                      startGry();
+	                      repaint();
+	                  }
+	              }
+	              
+	              if(Kontener.pauza == false) {
+	              //sprawdz czy cyfra klikniêta
+		              for(int i = 0; i < cyferki.length ; i++){
+		            	  
+		                      if(cyferki[i].czyZawieraKlikniecie(me.getX(), me.getY())){
+		                          
+		                        	  //dodanie do wektora pierwszej kliknietej cyfry
+		                        	  if(dodaneCyfry.size() < 1) {
+		                        		  int zawartosc = cyferki[i].podajWartosc();
+		                        		  dodaneCyfry.add(cyferki[i]);
+		                        		  Kontener.czasGry++;
+		                        		  sumaKlikniec = zawartosc;
+		                        		  
+		                        	  }
+		                        	  //jesli pierwsza cyfra jest wpisana to dodaj 2 cyfrê do wektora
+		                        	  else {
+		                    			  int zawartosc2 = cyferki[i].podajWartosc();
+		                    			  sumaKlikniec = sumaKlikniec + zawartosc2;
+		                    			  
+		                    			  for(int j = 1 ; j < Kontener.startowe; j+=2) {
+		                  					  
+		                    				  if(wynikiWykorzystane[j] != 0) { //zabezpieczenie przed powtórnym obliczeniem tego samego wyniku w celu przejœcia poziomu
+		                    					  continue;
+		                    				  }
+		                    				  else {
+			                    				  //gdy suma dwóch ostatnich klikniêæ jest równa jednemu z wyników do uzyskania to przerysuj j¹                   				  
+			                    				  if(sumaKlikniec == wyniki[j].wartosc) {
+			                    					       
+			                    					  	  wynikiWykorzystane[j] = 1;
+			                    					  	  
+			                    						  licznik++;
+			                    						  cyferki[j].dzwiek("dzwieki/pyk.wav"); //dzwiek znikaj¹cej Wyniki
+			                    						  
+			                    						  Kontener.czasGry++;// dodane w celu zniwelowania czasu obs³ugi dodawania
+			                    						  
+			                    						  //wspó³rzêdna x dobrze obliczonego wyniku 
+			                    						  int x = 105;
+			                    						  //wspó³rzêdna y dobrze obliczonego wyniku 
+			                    						  int y = 320;
+			                    						  wynikObliczenie = j;
+			                    						  //narysowanie obliczonej Wyniki
+			                    						  wyniki[j] = new Wyniki(x , y + 30 * j, Kontener.obliczoneWyniki , sumaKlikniec);
+			                    						  Kontener.czyZmienic = true;	                    						  
+			                    						  //gdy obliczono wszystkie wyniki z danej rundy to w zale¿noœci od poziomu narysuj odpowiedni¹ iloœæ wyników do obliczenia
+			                    						  if(licznik == Kontener.startowe / 2) {
+			                    							  if(Poziom.poziom < 4) {
+			                    								  Kontener.startowe = 4;
+			                    							  }
+			                    							  else if(Poziom.poziom >= 4 && Poziom.poziom < 8) {
+			                    								  Kontener.startowe = 6;
+			                    							  }
+			                    							  else if(Poziom.poziom >= 8 && Poziom.poziom < 12) {
+			                    								  Kontener.startowe = 8;
+			                    							  }
+			                    							  else if(Poziom.poziom >= 12 && Poziom.poziom < 16) {
+			                    								  Kontener.startowe = 10;
+			                    							  }
+			                    							  else {
+			                    								  Kontener.startowe = 12;
+			                    							  }
+			                    							  zerujWykorzystane();
+			                    							  Poziom.nastepnyPoziom();
+			                    							  startGry();
+			                    							  repaint();
+			                    							  licznik = 0;
+			                    						        
+			                    						  }	                    					  
+			                    				  }
+		                    				  }
+		                    			  }
+		                    			  //wyczyœæ wektor
+		                    			  dodaneCyfry.clear();
+		                    			  sumaKlikniec = 0;
+		                    			  repaint();
+		                    		  }
+		                      }	                      
+		              }
+	              }
+	              }else if(Kontener.menu == true && Kontener.instrukcja == false){//gdy gra siê nie zaczê³a to wyœwietl menu g³ówne
+	            	  
+	            	  //klikniety przycisk startu gry
+	            	  if(me.getX()>(268) && me.getX()<(492)  && me.getY()>(217) && me.getY()<(297)){
+	            		  //ustaw parametry startowe
+	                      Kontener.menu =!Kontener.menu;
+	                      Poziom.reset();
+	                      Kontener.czasGry = czas;
+	                      Kontener.startowe = 4;
+	                      startGry();
+	                  }
+	            	  
+	            	  // klikniete informacje o grze
+	            	  if(me.getX()>(268) && me.getX()<(492)  && me.getY()>(337) && me.getY()<(417)){
+	            		  //wyœwietlenie obrazka instrukcji
+	                      Kontener.instrukcja = true;
+	                  }
+	            	  
+	            	  //gdy w menu g³ównym klikniêto przycisk wyjœcie
+	            	  if(me.getX()>(268) && me.getX()<(492)  && me.getY()>(457) && me.getY()<(537)){
+	                      System.exit(1);
+	                  }
+	            	  
+	              }else if(Kontener.menu == true && Kontener.instrukcja == true) {//gdy jest wyœwietlana instrukcja
+	            	  //i nast¹pi klikniêcie guzika menu to wróæ do menu g³ównego
+	            	  if(me.getX()>(500) && me.getX()<(690)  && me.getY()>(620) && me.getY()<(676)){
+	                	  Kontener.instrukcja = false;
+	                	  Kontener.menu = true;
+	                  }
+	            	  
+	              }
+          }//koniec mouseClicked()
       });
 	}
 	
@@ -223,16 +215,12 @@ public class Plansza extends JPanel{
 	@Override
 	protected void paintComponent(Graphics gs) {
 		Graphics2D g=(Graphics2D)gs;
-        //antyaliasing
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
         // gdy nie klikniêto pauzy to wyœwietlaj odliczany czas
 	    if(Kontener.pauza == false) {
 	        Kontener.czasGry--;
 	        
         }
-	    else { //klikniêto pauzê, zatrzymaj czas
-	    	Kontener.czasGry = Kontener.czasGry;
-	    }
 	    
 	    String czas = Integer.toString(Kontener.czasGry); //String który jest wyœwietlany jako czas
         
@@ -244,61 +232,56 @@ public class Plansza extends JPanel{
         else if(Kontener.menu == true && Kontener.instrukcja == true) {
         	g.drawImage(Kontener.instrukcjaObraz, 0, 0, null);
         }
-        // jeœli kliknieto start to trwa gra
+        // jeœli kliknieto start
         else if(Kontener.menu == false && Kontener.instrukcja == false){
         	if(Kontener.czasGry < 1) { //gdy czas siê skoñczy
             	g.drawImage(Kontener.koniecObraz, 0, 0, null);
             	g.setFont(graFont);
-            	g.drawString("Pokonane rundy: " +statusGry.poziom, 270, 400);
+            	g.drawString("Pokonane rundy: " +Poziom.poziom, 270, 400);
             	g.drawString("GRATULACJE", 290, 430);
-            }else {       
+            }
+        	else {       
             	g.drawImage(Kontener.tlo, 0, 0, null);
 	        
-		        //rysowanie cyferek na tle z plansz¹
+		        //rysowanie cyferek na planszy
 		        for(int i = 0 ; i < cyferki.length; i++) {	        	
-		        	g.drawImage(cyferki[i].icon, cyferki[i].x, cyferki[i].y,null);	        	
+		        	g.drawImage(cyferki[i].ikona, cyferki[i].x , cyferki[i].y,null);	        	
 		        }
 	        
-		        //rysowanie sum
+		        //rysowanie wyników
 		        for(int i = 1 ; i < Kontener.startowe; i+=2) {	
-		        	g.drawImage(sumki[i].icon, sumki[i].x, sumki[i].y,null);		        	
+		        	g.drawImage(wyniki[i].ikona , wyniki[i].x , wyniki[i].y,null);		        	
 		        }
 	        
-		        //jak obliczono sumê to zmieñ jej wygl¹d (suma znika)
+		        //jak obliczono wynik to zmieñ jego wygl¹d (wynik znika)
 		        if(Kontener.czyZmienic) {
-		        	g.drawImage(sumki[sumaPoliczona].icon, sumki[sumaPoliczona].x, sumki[sumaPoliczona].y,null);
+		        	g.drawImage(wyniki[wynikObliczenie].ikona , wyniki[wynikObliczenie].x , wyniki[wynikObliczenie].y , null);
 		        	Kontener.czyZmienic = false;
 		        	repaint();
 		        }
 	        
 		        g.setFont(graFont);
 		        //rysowanie czasu
-		        g.drawString("Do koñca gry pozosta³o " +czas+ " sekund", 260, 160);
+		        g.drawString("Do koñca gry pozosta³o " +czas+ " sekund", 260 , 160);
 		        //rysowanie aktualnej rundy
-		        g.drawString("Aktualna runda "+statusGry.poziom,500, 200);
+		        g.drawString("Aktualna runda "+Poziom.poziom , 500 , 200);
 		        //guzik menu
-		        g.drawImage(Kontener.menuObraz, 40,50,null);
+		        g.drawImage(Kontener.menuObraz, 40 , 50 , null);
 		        //guzik pauzy
-		        g.drawImage(Kontener.pauzaObraz, 460,50,null);
+		        g.drawImage(Kontener.pauzaObraz, 460 , 50 , null);
 	           
 		        if(Kontener.pauza){
 		        	//jak kliknieto pauze to wyswietl guzik wznowienia gry i restart
-		        	g.drawImage(Kontener.restartObraz ,40,140,null);
-		        	g.drawImage(Kontener.wznowObraz, 460,50,null);
-		        	g.drawImage(Kontener.zaslonaObraz, 0 , 255 ,null);
+		        	g.drawImage(Kontener.restartObraz , 40 , 140 , null);
+		        	g.drawImage(Kontener.wznowObraz, 460 , 50 , null);
+		        	g.drawImage(Kontener.zaslonaObraz, 0 , 255 , null);
 		        }
             }
         }	
-	}//paintComponent()
-	
-	public void zerujWykorzystane() {
-		for(int i = 0 ; i < Kontener.startowe; i++) {
-			wykorzystanei[i]= 0;
-		}
-	}
+	}//koniec paintComponent()
 	
 	
-	private void startGame() {
+	private void startGry() {
 		cyferki = new Cyferki[20];
 		int tablicaLokacja []= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		
@@ -314,7 +297,7 @@ public class Plansza extends JPanel{
     		lokacja = random.nextInt(RZEDY * KOLUMNY);//mozliwe wyskoczenie cyferek
     		tablicaLokacja[i] = lokacja;
     		//wyeliminowanie mozliwosci wyskoczenia cyferek na tych samych polach planszy
-    		for(int k=0;k<i;k++)	  {		
+    		for(int k = 0; k < i ; k++)	  {		
 				if(lokacja == tablicaLokacja[k]){		
 					i--;		  
 					}	  
@@ -328,7 +311,7 @@ public class Plansza extends JPanel{
     		int y = rzad * 61 + 283;
     		int losowa;
     		
-    		if(statusGry.poziom < 10) {
+    		if(Poziom.poziom < 10) {
     			 losowa = random.nextInt(9);	// gdy poziom jest niski to nie ma ujemnych cyferek
     		}else {
     			 losowa = random.nextInt(18); // od 10 rundy pojawiaj¹ siê ujemne cyfry
@@ -339,25 +322,32 @@ public class Plansza extends JPanel{
     		wylosowane[i] = wartoscKwadratu;
     		cyferki[i] = new Cyferki(x, y, Kontener.cyferki, wartoscKwadratu);
         }
-		sumator();
+		obliczanie();
+	}//koniec startGry()
+	
+	/**
+	 * Zeruje tablicê wyników wykorzystanych
+	 */
+	public void zerujWykorzystane() {
+		for(int j = 1 ; j < Kontener.startowe; j+=2) {
+			wynikiWykorzystane[j] = 0;
+		}
 	}
 	
 	/**
-	 * Obliczanie sum do uzyskania
+	 * Obliczanie wyników do wpisania w panel po lewej stronie ekranu
 	 */
-	public void sumator() {
-		int suma = 0;
+	public void obliczanie() {
+		int wynik = 0;
 		int x = 105;
 		int y = 320;
 		for(int j = 0 ; j < Kontener.startowe; j++) {
-			suma = suma + wylosowane[j];
+			wynik = wynik + wylosowane[j];
 			if(j % 2 == 1) {
-				sumki[j] = new Sumy(x , y + 30 * j,Kontener.sumki, suma);
-				sumy[j] = suma;
+				wyniki[j] = new Wyniki(x , y + 30 * j, Kontener.wyniki , wynik);
 				repaint();
-				suma = 0;
+				wynik = 0;
 			}
 		}
-	}//sumator()
-	
+	}//koniec obliczanie()	
 }

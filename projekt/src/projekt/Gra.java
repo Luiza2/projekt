@@ -11,20 +11,19 @@ public class Gra extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	/**
-     * G³ówny konstruktor klasy - ustawienie parametrów i rozpoczêcie akcji
+     * Konstruktor klasy s³u¿y do utworzenia okna i rozpoczêcia gry
      * @param szerokosc szerokoœæ okna gry
      * @param wysokosc wysokoœæ okna gry
-     * @param calkowityCzas czas gry
      */
 	public Gra(int szerokosc, int wysokosc){
 		
-		super("£¹czenie cyferek"); //wywo³anie konstruktora klasy nadrzêdnej - utworzenie okna
+		super("£¹czenie cyferek"); //utworzenie okna
 		setSize(szerokosc, wysokosc); //ustawienie wymiarów okna	
 		setResizable(false); //nie mo¿na zmieniaæ wymiarów okna
-		setLocationRelativeTo(null); //okno pojawi siê w centrum ekranu
+		setLocationRelativeTo(null); //okno wyœrodkuje siê na ekranie
 		inicjalizacja(szerokosc, wysokosc); //wywo³anie metody tworzenia interfejsu
 		setVisible(true); //okno widoczne
-		petlaGry(); //wywo³anie metody - pêtla animacji gry
+		petlaGry(); //wywo³anie pêtli gry
 			
 	}
 	
@@ -37,11 +36,10 @@ public class Gra extends JFrame {
 		 Kontener.zaladujZdjecie();
 		 Plansza plansza = new Plansza(szerokosc,wysokosc); //utworzenie obiektu typu plansza
 		 add(plansza); //dodanie planszy do okna
-	}//inicjalizacja()
+	}//koniec inicjalizacja()
 	
 	/**
 	 * Pêtla g³ówna gry
-	 * @param timer s³u¿y do odœwie¿ania ekranu co sekundê i liczenia czasu trwania gry
 	 */
 	public void petlaGry() {
 		long timer = System.currentTimeMillis(); //pobranie aktualnego czasu w milisekundach			
@@ -51,6 +49,6 @@ public class Gra extends JFrame {
 				timer += 1000;
 			}
 		}
-	}//petlaGry()
+	}//koniec petlaGry()
 	
 }
